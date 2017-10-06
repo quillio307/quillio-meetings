@@ -14,11 +14,17 @@ $(document).ready(function(){
         socket.emit('silenceAll', {room: room, user: user})
     });
 
+    $("#start").click(function () {
+        socket.emit('start', {room: room, user: user})
+    });
+    $("#end").click(function () {
+        socket.emit('end', {room: room, user: user})
+    });
     socket = io.connect('http://localhost:5000/meetings');
 
     socket.on('receivemsg', function(msg) {
         console.log(msg);
-        $('ul#msgboard').append('<li>'+ msg.data +'</li>');
+        msglog(msg.data);
     });
 
     socket.emit('join', {
@@ -31,4 +37,16 @@ $(document).ready(function(){
         mic_toggle = !mic_toggle;
         $("#mic").attr('style', 'background:gray;');
     });
+
+    socket.on('startMeeting', function () {
+        msglog("Meeting Started");
+    });
+    socket.on('endMeeting', function () {
+        msglog("Meeting Ended");
+    });
+
+    var msglog = function(txt) {
+        $('ul#msgboard').append('<li>'+ txt +'</li>');
+    };
+
 });

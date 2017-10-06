@@ -3,6 +3,9 @@
 {% block main %}
 <div class="jumbotron">
     <h1 class="h1-responsive">{{meeting.title}}</h1>
+    <button type="button" class="btn btn-success" id="start">Start</button>
+    <button type="button" class="btn btn-danger" id="end">End</button>
+
     <ul id="msgboard"></ul>
     <br>
     <a class="btn-floating btn-lg pkColor" id="mic" style="background:gray;">

@@ -40,10 +40,22 @@ def on_join(data):
     join_room(data['room_id'])
     emit('receivemsg', {'data': data['user_id'] + ' has joined the meeting.'}, room=data['room_id'])
 
+
+@socketio.on('start', namespace='/meetings')
+def start_meeting(data):
+    emit('startMeeting', room=data['room'])
+
+
+@socketio.on('end', namespace='/meetings')
+def start_meeting(data):
+    emit('endMeeting', room=data['room'])
+
+
 @socketio.on('silenceAll', namespace='/meetings')
 def silence_all(data):
     emit('silence', {}, room=data['room'], include_self=False)
     emit('receivemsg', {'data': data['user'] + " is talking."}, room=data['room'])
+
 
 @socketio.on('leave', namespace='/meetings')
 def on_leave(data):
