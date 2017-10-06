@@ -11,7 +11,8 @@ $(document).ready(function(){
 
         $("#mic").attr('style', '');
         mic_toggle = true;
-        socket.emit('silenceAll', {room: room, user: user})
+        socket.emit('silenceAll', {room: room, user: user});
+        mediaStream.getAudioTracks()[0].enabled = true;
     });
 
     $("#start").click(function () {
@@ -36,17 +37,56 @@ $(document).ready(function(){
         console.log("Received silence command.");
         mic_toggle = !mic_toggle;
         $("#mic").attr('style', 'background:gray;');
+        mediaStream.getAudioTracks()[0].enabled = false;
     });
+
+    var mediaRecorder;
+    var mediaStream;
+    var handleSuccess = function(stream) {
+        mediaStream = stream;
+        const options = {mimeType: 'audio/webm'};
+        mediaRecorder= new MediaRecorder(stream, options);
+        const recordedChunks = [];
+        mediaRecorder.addEventListener('dataavailable', function(e) {
+          if (e.data.size > 0) {
+              //if(mic_toggle){
+                  recordedChunks.push(e.data);
+              //}else{
+                  //recordedChunks.push(e.data.size)
+              //}
+          }
+        });
+
+        mediaRecorder.addEventListener('stop', function() {
+            saveData(new Blob(recordedChunks), "meeting_audio"+new Date()+".wav");
+        });
+
+    };
+    navigator.mediaDevices.getUserMedia({ audio: true, video: false })
+      .then(handleSuccess);
 
     socket.on('startMeeting', function () {
         msglog("Meeting Started");
+        mediaRecorder.start();
     });
     socket.on('endMeeting', function () {
         msglog("Meeting Ended");
+        mediaRecorder.stop();
     });
 
     var msglog = function(txt) {
         $('ul#msgboard').append('<li>'+ txt +'</li>');
     };
-
+    var saveData = (function () {
+        var a = document.createElement("a");
+        document.body.appendChild(a);
+        a.style = "display: none";
+        return function (data, fileName) {
+            var url = window.URL.createObjectURL(data);
+            a.href = url;
+            a.download = fileName;
+            a.click();
+            window.URL.revokeObjectURL(url);
+        };
+    }());
 });

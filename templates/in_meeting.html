@@ -5,41 +5,13 @@
     <h1 class="h1-responsive">{{meeting.title}}</h1>
     <button type="button" class="btn btn-success" id="start">Start</button>
     <button type="button" class="btn btn-danger" id="end">End</button>
-
+    <br>
     <ul id="msgboard"></ul>
     <br>
     <a class="btn-floating btn-lg pkColor" id="mic" style="background:gray;">
         <i class="fa fa-microphone fa-5x"></i>
     </a>
      <audio id="player" controls></audio>
-    <script>
-      var player = document.getElementById('player');
-
-      /*var handleSuccess = function(stream) {
-        if (window.URL) {
-          player.src = window.URL.createObjectURL(stream);
-        } else {
-          player.src = stream;
-        }
-      };*/
-      var handleSuccess = function(stream) {
-        var context = new AudioContext();
-        var input = context.createMediaStreamSource(stream)
-        var processor = context.createScriptProcessor(1024,1,1);
-
-        input.connect(processor);
-        processor.connect(context.destination);
-
-        processor.onaudioprocess = function(e){
-          // Do something with the data, i.e Convert this to WAV
-          //console.log(e.inputBuffer);
-        };
-      };
-
-  navigator.mediaDevices.getUserMedia({ audio: true, video: false })
-      .then(handleSuccess);
-
-    </script>
 </div>
 
 <a class="btn-floating btn-lg pkColor" style="position: fixed; right:35px; bottom:35px;" data-toggle="modal" data-target="#createMeetingForm"><i class="fa fa-plus"></i></a>
