@@ -1,15 +1,27 @@
 var socket;
 $(document).ready(function(){
-    socket = io.connect('http://localhost:5000/test');
-    socket.on('my response', function(msg) {
+    socket = io.connect('http://localhost:5000/meetings');
+    var user;
+    var room;
+    socket.on('receivemsg', function(msg) {
         console.log(msg);
+        $('ul').append('<li>'+ msg.data +'</li>');
     });
-    $('form#emit').submit(function(event) {
-        socket.emit('my event', {data: $('#emit_data').val()});
-        return false;
+    $( "#chatBut" ).click(function() {
+        socket.emit('sendmsg', {
+            username: user,
+            room: room,
+            data: $("#chat" ).val()
+        });
     });
-    $('form#broadcast').submit(function(event) {
-        socket.emit('my broadcast event', {data: $('#broadcast_data').val()});
-        return false;
+    $( "#roomBut" ).click(function() {
+        room = $("#room" ).val();
+        user = $("#user" ).val();
+        socket.emit('join', {
+            username: user,
+            room: room
+        });
+        console.log("Join emitted.");
     });
+
 });

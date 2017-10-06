@@ -2,13 +2,23 @@
     <head>
         <title>Heroku SocketIO</title>
         <script
-  src="https://code.jquery.com/jquery-3.2.1.min.js"
-  integrity="sha256-hwg4gsxgFZhOsEEamdOYGBf13FyQuiTwlAQgxVSNgt4="
-  crossorigin="anonymous"></script>
+          src="https://code.jquery.com/jquery-3.2.1.min.js"
+          integrity="sha256-hwg4gsxgFZhOsEEamdOYGBf13FyQuiTwlAQgxVSNgt4="
+          crossorigin="anonymous"></script>
        <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/1.3.6/socket.io.min.js"></script>
         <script type="text/javascript" src="/static/main.js"></script>
     </head>
     <body>
-        <h1>hi</h1>
+        <h1>Quillio Meeting Room</h1>
+        <div id="messages">
+            <ul>
+            </ul>
+        </div>
+        <input type="text" id="chat" name="tex">
+        <button type="button" id="chatBut">Submit</button>
+        <br>
+        <input type="text" id="user" name="tex">
+        <input type="text" id="room" name="tex">
+        <button type="button" id="roomBut">Join</button>
     </body>
 </html>
