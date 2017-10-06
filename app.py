@@ -1,4 +1,4 @@
-from flask import Flask, render_template, abort
+from flask import Flask, render_template, abort, request
 from flask_socketio import SocketIO, emit, join_room, leave_room, send, rooms
 from config import CONFIG_PATH
 from setup import db
@@ -30,7 +30,6 @@ def meeting_page(user_id, room_id):
     return render_template('in_meeting.html', meeting={'title': meeting.name})
 
 
-
 @socketio.on('join', namespace='/meetings')
 def on_join(data):
     user = User.objects.with_id(data['user_id'])
@@ -41,6 +40,10 @@ def on_join(data):
     join_room(data['room_id'])
     emit('receivemsg', {'data': data['user_id'] + ' has joined the meeting.'}, room=data['room_id'])
 
+@socketio.on('silenceAll', namespace='/meetings')
+def silence_all(data):
+    emit('silence', {}, room=data['room'], include_self=False)
+    emit('receivemsg', {'data': data['user'] + " is talking."}, room=data['room'])
 
 @socketio.on('leave', namespace='/meetings')
 def on_leave(data):

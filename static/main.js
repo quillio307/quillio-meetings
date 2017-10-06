@@ -1,22 +1,21 @@
 var socket;
 $(document).ready(function(){
-    var mic_toggle = false;
-    $("#mic").click(function () {
-        if(mic_toggle){
-            $("#mic").attr('style', 'background:gray;');
-        }else{
-            $("#mic").attr('style', '');
-        }
-        mic_toggle = !mic_toggle;
-    });
-
     var url =window.location.href;
     var args =url.split('/');
-    socket = io.connect('http://localhost:5000/meetings');
+
     var user = args[args.length-2];
     var room = args[args.length-1];
-    console.log(user);
-    console.log(room);
+
+    var mic_toggle = false;
+    $("#mic").click(function () {
+
+        $("#mic").attr('style', '');
+        mic_toggle = true;
+        socket.emit('silenceAll', {room: room, user: user})
+    });
+
+    socket = io.connect('http://localhost:5000/meetings');
+
     socket.on('receivemsg', function(msg) {
         console.log(msg);
         $('ul#msgboard').append('<li>'+ msg.data +'</li>');
@@ -27,4 +26,9 @@ $(document).ready(function(){
         room_id: room
     });
 
+    socket.on('silence', function () {
+        console.log("Received silence command.");
+        mic_toggle = !mic_toggle;
+        $("#mic").attr('style', 'background:gray;');
+    });
 });
