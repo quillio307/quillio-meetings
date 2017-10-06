@@ -1,14 +1,28 @@
 from flask import Flask, render_template
 from flask_socketio import SocketIO, emit, join_room, leave_room, send
+from config import CONFIG_PATH
+from setup import db
+import json
+
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'secret!'
 socketio = SocketIO(app, logger=True)
+app.config.from_pyfile(CONFIG_PATH)
+db.init_app(app)
 
+from model.user import User
+from model.meeting import Meeting
 
 @app.route('/')
 def index():
     return render_template('index.html')
+
+
+@app.route('/meeting/<user_id>/<room_id>')
+def meeting_page(user_id, room_id):
+    return User.objects.with_id(user_id).email + Meeting.objects.with_id(room_id).name
+
 
 
 @socketio.on('join', namespace='/meetings')
