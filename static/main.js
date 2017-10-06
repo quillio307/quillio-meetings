@@ -1,27 +1,30 @@
 var socket;
 $(document).ready(function(){
+    var mic_toggle = false;
+    $("#mic").click(function () {
+        if(mic_toggle){
+            $("#mic").attr('style', 'background:gray;');
+        }else{
+            $("#mic").attr('style', '');
+        }
+        mic_toggle = !mic_toggle;
+    });
+
+    var url =window.location.href;
+    var args =url.split('/');
     socket = io.connect('http://localhost:5000/meetings');
-    var user;
-    var room;
+    var user = args[args.length-2];
+    var room = args[args.length-1];
+    console.log(user);
+    console.log(room);
     socket.on('receivemsg', function(msg) {
         console.log(msg);
-        $('ul').append('<li>'+ msg.data +'</li>');
+        $('ul#msgboard').append('<li>'+ msg.data +'</li>');
     });
-    $( "#chatBut" ).click(function() {
-        socket.emit('sendmsg', {
-            username: user,
-            room: room,
-            data: $("#chat" ).val()
-        });
-    });
-    $( "#roomBut" ).click(function() {
-        room = $("#room" ).val();
-        user = $("#user" ).val();
-        socket.emit('join', {
-            username: user,
-            room: room
-        });
-        console.log("Join emitted.");
+
+    socket.emit('join', {
+        user_id: user,
+        room_id: room
     });
 
 });

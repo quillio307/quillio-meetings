@@ -1,7 +1,8 @@
-from flask import Flask, render_template
-from flask_socketio import SocketIO, emit, join_room, leave_room, send
+from flask import Flask, render_template, abort
+from flask_socketio import SocketIO, emit, join_room, leave_room, send, rooms
 from config import CONFIG_PATH
 from setup import db
+from mongoengine import errors
 import json
 
 
@@ -21,16 +22,24 @@ def index():
 
 @app.route('/meeting/<user_id>/<room_id>')
 def meeting_page(user_id, room_id):
-    return User.objects.with_id(user_id).email + Meeting.objects.with_id(room_id).name
+    user = User.objects.with_id(user_id)
+    meeting = Meeting.objects.with_id(room_id)
+    if user is None or meeting is None:
+        abort(404)
+
+    return render_template('in_meeting.html', meeting={'title': meeting.name})
 
 
 
 @socketio.on('join', namespace='/meetings')
 def on_join(data):
-    username = data['username']
-    room = data['room']
-    join_room(room)
-    emit('receivemsg', {'data': username + ' has entered the room.'}, room=room)
+    user = User.objects.with_id(data['user_id'])
+    meeting = Meeting.objects.with_id(data['room_id'])
+    if meeting.active is False:
+        meeting.active = True
+        meeting.save()
+    join_room(data['room_id'])
+    emit('receivemsg', {'data': data['user_id'] + ' has joined the meeting.'}, room=data['room_id'])
 
 
 @socketio.on('leave', namespace='/meetings')

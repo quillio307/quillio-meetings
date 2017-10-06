@@ -8,7 +8,6 @@ class User(db.Document):
     password = db.StringField(required=True, min_length=5, max_length=100)
     active = db.BooleanField(default=True)
     authenticated = db.BooleanField(required=False, default=False)
-    groups = db.ListField(db.ReferenceField('Group'), default=[])
     meta = {'strict': False}
 
     def is_authenticated(self):
